@@ -1,0 +1,6 @@
+User
+please write me a Flask stock and option portfolio monitoring app that take quotes from yfinance and monitors historical and daily P&L breaking down realised and unrealised and takign into account currency conversion if applicable, the main currency being USD (I only expect USD, EUR, CHF, AUD, PLN, SGD and GBP for now)
+I need to be able to toggle open and closed positions
+You will load positions and trades from a collection of activity files from interactive broker, if you can find the format description for those files just build a simple trade file format that we will adjust later, please also give some sample data in your answer.
+
+the portfolio app shuold look somehting like the one in the picture attached
