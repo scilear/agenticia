@@ -1,0 +1,1 @@
+[{"action": "execute_command", "command": "sudo groupadd docker", "error": "Command 'sudo groupadd docker' returned non-zero exit status 9.", "stderr": "groupadd: group 'docker' already exists"}]

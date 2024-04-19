@@ -2,10 +2,8 @@
 import datetime
 from flask import Flask, render_template, request, jsonify
 import json_task_executor
-from flask_socketio import SocketIO
 
 app = Flask(__name__)
-socketio = SocketIO(app)
 
 @app.route('/')
 def home():
@@ -20,6 +18,7 @@ def execute():
                 temp_file.write(json_text)
             json_task_executor.main('temp.json')
             current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            append_to_logs(current_time)
             return jsonify({'message': f"Last executed at {current_time}"})
     return jsonify({'message': 'No JSON instructions provided.'})
 
@@ -40,14 +39,15 @@ def execute():
 #         else:
 #             return jsonify({'prompt': None})
 
-# Define a global variable to store logs
 logs = []
+
+@app.route('/logs')
+def get_logs():
+    return jsonify(logs)
 
 def append_to_logs(log_entry):
     global logs
     logs.append(log_entry)
-    socketio.emit('log_update', {'log': log_entry}, broadcast=True)
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
-
+    app.run(debug=True)

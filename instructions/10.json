@@ -1,0 +1,24 @@
+{
+  "source": "OpenAI ChatGPT",
+  "request_id": "web_interface_task_24680",
+  "response": [
+    
+    {
+      "task_id": "write_web_code",
+      "action": "write_code",
+      "description": "Write the Python code for the web interface.",
+      "details": {
+        "file": "test.py",
+        "code": "toto"
+      }
+    }
+  ],
+  "assumptions": [
+    "Python and pip are already installed on the system.",
+    "The execution logs will be saved in the current directory."
+  ],
+  "questions": [
+    "Do you have any specific requirements for the web interface?",
+    "Should the interface support file upload for JSON instructions?"
+  ]
+}

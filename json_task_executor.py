@@ -34,7 +34,7 @@ def write_code(base_path, file_path, code):
         if os.path.exists(full_path):
             logging.info('File already exists and committing before changing.')
             execute_command(f"git add '{full_path}'")
-            execute_command(f"git commit -am 'automated overwrite'")
+            execute_command(f"git commit -am 'automated overwrite' {full_path}")
             #     user_choice = requests.post(f'{app_url}/overwrite-choice', data={'file': full_path})
             #     print(user_choice.text)
             #     if user_choice.text != 'Yes':

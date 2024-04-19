@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Task Executor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
+
+</head>
+<body>
+    <h1>JSON Task Executor</h1>
+   <form id="jsonForm" action="/execute" method="post">
+        <label for="json_text">Enter JSON instructions:</label><br>
+        <textarea id="json_text" name="json_text" rows="10" cols="50"></textarea><br>
+        <button type="submit">Execute</button>
+        <span id="executionStatus"></span>
+    </form>
+    </div>
+    <div id="logs-panel" style="float:right; width: 40%;">
+        <h2>Execution Logs</h2>
+        <ul id="logs-list"></ul>
+    </div>
+    <script>
+        function fetchLogs() {
+            $.getJSON('/logs', function(data) {
+                $('#logs-list').empty();  // Clear existing logs
+                data.forEach(function(log) {
+                    $('#logs-list').append('<li>' + log + '</li>');  // Append each log entry
+                });
+            });
+        }
+
+        // Fetch logs every 2 seconds
+        setInterval(fetchLogs, 2000);
+
+        document.getElementById("jsonForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        var json_text = document.getElementById("json_text").value;
+
+        fetch('/execute', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'json_text=' + encodeURIComponent(json_text)
+        })
+        .then(response => response.json()) // Ensure server responds with JSON
+        .then(data => {
+            document.getElementById("executionStatus").innerText = data.message; // Make sure this matches the JSON key
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById("executionStatus").innerText = 'Error occurred. Please check console for details.';
+        });
+    });
+
+        </script>
+        
+</body>
+</html>
