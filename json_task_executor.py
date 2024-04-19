@@ -36,7 +36,7 @@ def write_code(base_path, file_path, code):
         #     print(user_choice.text)
         #     if user_choice.text != 'Yes':
             logging.info('File already exists and committing before changing.')
-            execute_command(f"git commit -am 'atuomated overwrite'")
+            execute_command(f"git commit -am 'automated overwrite'")
 
         os.makedirs(os.path.dirname(full_path), exist_ok=True)
         with open(full_path, 'w') as file:
