@@ -32,12 +32,12 @@ def write_code(base_path, file_path, code):
             raise ValueError('File path is a symlink. Aborting for security reasons.')
 
         if os.path.exists(full_path):
-        #     user_choice = requests.post(f'{app_url}/overwrite-choice', data={'file': full_path})
-        #     print(user_choice.text)
-        #     if user_choice.text != 'Yes':
             logging.info('File already exists and committing before changing.')
             execute_command(f"git add '{full_path}'")
             execute_command(f"git commit -am 'automated overwrite'")
+            #     user_choice = requests.post(f'{app_url}/overwrite-choice', data={'file': full_path})
+            #     print(user_choice.text)
+            #     if user_choice.text != 'Yes':
 
         os.makedirs(os.path.dirname(full_path), exist_ok=True)
         with open(full_path, 'w') as file:
