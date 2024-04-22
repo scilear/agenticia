@@ -1,11 +1,22 @@
-def add_agent(agent_id, role, capabilities):
-    conn = sqlite3.connect('agent_database.db')
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO agents (agent_id, role, capabilities, status, current_task)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (agent_id, role, capabilities, 'available', ''))
-    conn.commit()
-    conn.close()
+import sqlite3
 
-# Define other agent management functions...
+# Create a connection to the database
+conn = sqlite3.connect('agent_database.db')
+cursor = conn.cursor()
+
+# Create the agents table
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS agents (
+        agent_id TEXT PRIMARY KEY,
+        role TEXT,
+        capabilities TEXT,
+        status TEXT,
+        current_task TEXT
+    )
+''')
+
+# Commit the changes
+conn.commit()
+
+# Close the connection
+conn.close()
