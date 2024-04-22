@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Agent Management</title>
+</head>
+<body>
+    <h1>Agent Management</h1>
+    <table>
+        <tr>
+            <th>Agent ID</th>
+            <th>Name</th>
+            <th>Status</th>
+        </tr>
+        {% for agent in agents %}
+        <tr>
+            <td>{{ agent[0] }}</td>
+            <td>{{ agent[1] }}</td>
+            <td>{{ agent[2] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

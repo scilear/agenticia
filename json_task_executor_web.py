@@ -4,6 +4,8 @@ import json
 import subprocess
 from pathlib import Path
 import logging
+from flask import render_template
+from agent_manager import get_agents
 
 
 class CustomHandler(logging.Handler):
@@ -154,6 +156,13 @@ def process_instructions_file(json_file):
         logger.error(f"Errors encountered. Details saved in '{error_file}'")
         print(errors)
 
+@app.route('/agents')
+def display_agents():
+    # Get the agent data
+    agents = get_agents()
+
+    # Render the template and pass the agent data
+    return render_template('agents.html', agents=agents)
 
 if __name__ == '__main__':
     app.run(debug=True)
