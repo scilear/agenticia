@@ -3,58 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Task Executor</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
-
+    <title>Task Executor</title>
+    <style>
+        #logPanel {
+            width: 40%;
+            height: 80vh;
+            overflow: auto;
+            float: right;
+            border: 1px solid black;
+            padding: 10px;
+        }
+        #jsonTextarea {
+            width: 40%;
+            height: 80vh; /* Match the height of the log panel */
+            resize: none; /* Disable resizing */
+        }
+    </style>
 </head>
 <body>
-    <h1>JSON Task Executor</h1>
-   <form id="jsonForm" action="/execute" method="post">
-        <label for="json_text">Enter JSON instructions:</label><br>
-        <textarea id="json_text" name="json_text" rows="10" cols="50"></textarea><br>
-        <button type="submit">Execute</button>
-        <span id="executionStatus"></span>
-    </form>
-    </div>
-    <div id="logs-panel" style="float:right; width: 40%;">
+    <h1>Task Executor</h1>
+    <div id="logPanel">
         <h2>Execution Logs</h2>
-        <ul id="logs-list"></ul>
+        <ul id="logList"></ul>
     </div>
+    <form id="executionForm">
+        <textarea id="jsonTextarea" rows="25"></textarea>
+        <br>
+        <button type="button" id="executeBtn">Execute</button>
+        <p>Last executed: <span id="lastExecuted"></span></p>
+    </form>
+
     <script>
         function fetchLogs() {
-            $.getJSON('/logs', function(data) {
-                $('#logs-list').empty();  // Clear existing logs
-                data.forEach(function(log) {
-                    $('#logs-list').append('<li>' + log + '</li>');  // Append each log entry
-                });
-            });
-        }
-
-        // Fetch logs every 2 seconds
-        setInterval(fetchLogs, 2000);
-
-        document.getElementById("jsonForm").addEventListener("submit", function(event) {
-        event.preventDefault();
-        var json_text = document.getElementById("json_text").value;
-
-        fetch('/execute', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: 'json_text=' + encodeURIComponent(json_text)
-        })
-        .then(response => response.json()) // Ensure server responds with JSON
+        fetch('/logs')
+        .then(response => response.json())
         .then(data => {
-            document.getElementById("executionStatus").innerText = data.message; // Make sure this matches the JSON key
+            const logList = document.getElementById('logList');
+            // Get the existing logs
+            const existingLogs = Array.from(logList.children);
+            // Clear the log list
+            logList.innerHTML = '';
+            // Add the new logs to the top
+            data.forEach(log => {
+                const logItem = document.createElement('li');
+                logItem.textContent = log;
+                logList.appendChild(logItem);
+            });
+            // Add the existing logs back to the bottom
+            existingLogs.forEach(logItem => logList.appendChild(logItem));
         })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById("executionStatus").innerText = 'Error occurred. Please check console for details.';
-        });
-    });
+        .catch(error => console.error('Error fetching logs:', error));
+    }
 
-        </script>
-        
+
+        document.getElementById('executeBtn').addEventListener('click', function() {
+            const jsonText = document.getElementById('jsonTextarea').value;
+            fetch('/execute', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'json_text': jsonText
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('lastExecuted').textContent = data.message;
+                fetchLogs(); // Fetch logs after execution
+            })
+            .catch(error => console.error('Error executing task:', error));
+        });
+
+        // Fetch logs initially and then every 5 seconds
+        fetchLogs();
+        setInterval(fetchLogs, 5000);
+    </script>
 </body>
 </html>

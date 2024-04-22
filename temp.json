@@ -9,12 +9,13 @@
       "description": "Write the Python code for the web interface.",
       "details": {
         "file": "test.py",
-        "code": "toto33"
+        "code": "toto"
       }
     }
   ],
   "assumptions": [
-    "TOTO33"
+    "Python and pip are already installed on the system.",
+    "The execution logs will be saved in the current directory."
   ],
   "questions": [
     "Do you have any specific requirements for the web interface?",
