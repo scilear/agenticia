@@ -83,8 +83,8 @@ def write_code(base_path, file_path, code):
 
         if os.path.exists(full_path):
             logger.info('File already exists and committing before changing.')
-            execute_command(f"git add '{full_path}'")
-            execute_command(f"git commit -am 'automated overwrite' {full_path}")
+            execute_command(f"git add .")
+            execute_command(f"git commit -am 'automated overwrite'")
 
         os.makedirs(os.path.dirname(full_path), exist_ok=True)
         with open(full_path, 'w') as file:
