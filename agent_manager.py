@@ -10,7 +10,7 @@ def get_agents():
     cursor = conn.cursor()
 
     # Retrieve agent records from the database
-    cursor.execute('SELECT agent_id, name, status FROM agents')
+    cursor.execute('SELECT agent_id as name, status FROM agents')
     agents = cursor.fetchall()
 
     conn.close()

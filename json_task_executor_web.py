@@ -164,5 +164,14 @@ def display_agents():
     # Render the template and pass the agent data
     return render_template('agents.html', agents=agents)
 
+@app.route('/chat', methods=['GET', 'POST'])
+def chat():
+    if request.method == 'POST':
+        user_message = request.form['user_input']
+        # Replace the code below with your AI response generation logic
+        ai_response = user_message
+        return jsonify({'response': ai_response})
+    return render_template('chat.html')
+
 if __name__ == '__main__':
     app.run(debug=True)

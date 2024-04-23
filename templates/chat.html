@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>AI Chat</h1>
+    <div id="chat-container">
+        <div id="chat-messages" style="height: 400px; overflow-y: scroll;"></div>
+        <form id="chat-form" style="position: fixed; bottom: 0; width: 80%;">
+            <textarea id="user-input" style="width: 100%; height: auto; resize: vertical;"></textarea>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        // Get the chat form, user input textarea, and chat messages container
+        var chatForm = document.getElementById('chat-form');
+        var userInput = document.getElementById('user-input');
+        var chatMessages = document.getElementById('chat-messages');
+
+        // Event listener for form submission
+        chatForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            sendMessage();
+        });
+
+        // Event listener for input changes in the user input textarea
+        userInput.addEventListener('input', function (event) {
+            adjustInputHeight();
+        });
+
+        /**
+         * Adjusts the height of the user input textarea based on its content.
+         * Limits the height to 10 lines.
+         */
+        function adjustInputHeight() {
+            userInput.style.height = 'auto';
+            userInput.style.height = Math.min(userInput.scrollHeight, 10 * userInput.rows) + 'px';
+        }
+
+        // Event listener for keydown in the user input textarea
+        userInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' && !event.ctrlKey && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            } else if ((event.key === 'Enter' || event.key === 'Return') && event.shiftKey) {
+                // Shift+Enter: Go to the next line in the input box
+                userInput.value += '\n';
+            } else if ((event.key === 'Enter' || event.key === 'Return') && event.ctrlKey) {
+                // Ctrl+Enter: Send the message
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        /**
+         * Sends the user message.
+         * Resets the input box to its normal size.
+         */
+        function sendMessage() {
+            var userMessage = userInput.value.trim();
+            if (userMessage !== '') {
+                displayMessage('You', userMessage);
+                userInput.value = '';
+                userInput.style.height = 'auto';
+                userInput.focus();
+            }
+        }
+
+        /**
+         * Displays a message in the chat messages container.
+         * @param {string} sender - The sender of the message.
+         * @param {string} message - The content of the message.
+         */
+        function displayMessage(sender, message) {
+            var messageElement = document.createElement('div');
+            messageElement.innerText = sender + ': ' + message;
+            chatMessages.appendChild(messageElement);
+        }
+    </script>
+{% endblock %}
