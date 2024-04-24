@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autocomplete</title>
+<style>
+  .autocomplete {
+    position: relative;
+    display: inline-block;
+  }
+
+  .autocomplete-list {
+    position: absolute;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    z-index: 1000;
+    width: 100%;
+  }
+
+  .autocomplete-list li {
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+
+  .autocomplete-list li:hover {
+    background-color: #ddd;
+  }
+</style>
+</head>
+<body>
+
+<h2>Autocomplete Demo</h2>
+
+<div class="autocomplete">
+  <textarea id="input" rows="4" cols="50"></textarea>
+  <ul class="autocomplete-list" id="autocomplete-list"></ul>
+</div>
+
+<script>
+  const input = document.getElementById('input');
+  const autocompleteList = document.getElementById('autocomplete-list');
+  const names = ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Frank', 'Grace']; // List of names
+
+  input.addEventListener('input', function() {
+    const searchText = input.value.substring(input.value.lastIndexOf('@') + 1);
+    const suggestions = names.filter(name => name.toLowerCase().includes(searchText.toLowerCase()));
+
+    if (searchText.length === 0) {
+      autocompleteList.innerHTML = '';
+      autocompleteList.style.display = 'none';
+      return;
+    }
+
+    autocompleteList.innerHTML = '';
+    suggestions.forEach(suggestion => {
+      const li = document.createElement('li');
+      li.textContent = suggestion;
+      autocompleteList.appendChild(li);
+    });
+
+    autocompleteList.style.display = 'block';
+  });
+
+  input.addEventListener('keydown', function(e) {
+    const activeItem = document.querySelector('.autocomplete-list li.active');
+    if (e.key === 'ArrowDown') {
+      if (activeItem) {
+        activeItem.classList.remove('active');
+        if (activeItem.nextElementSibling) {
+          activeItem.nextElementSibling.classList.add('active');
+        } else {
+          autocompleteList.firstChild.classList.add('active');
+        }
+      } else {
+        autocompleteList.firstChild.classList.add('active');
+      }
+    } else if (e.key === 'ArrowUp') {
+      if (activeItem) {
+        activeItem.classList.remove('active');
+        if (activeItem.previousElementSibling) {
+          activeItem.previousElementSibling.classList.add('active');
+        } else {
+          autocompleteList.lastChild.classList.add('active');
+        }
+      } else {
+        autocompleteList.lastChild.classList.add('active');
+      }
+    } else if (e.key === 'Tab' || e.key === 'Enter') {
+      e.preventDefault();
+      if (activeItem) {
+        input.value = input.value.substring(0, input.value.lastIndexOf('@') + 1) + activeItem.textContent;
+        autocompleteList.innerHTML = '';
+        autocompleteList.style.display = 'none';
+      }
+    }
+  });
+
+  autocompleteList.addEventListener('click', function(e) {
+    if (e.target.tagName === 'LI') {
+      input.value = input.value.substring(0, input.value.lastIndexOf('@') + 1) + e.target.textContent;
+      autocompleteList.innerHTML = '';
+      autocompleteList.style.display = 'none';
+    }
+  });
+
+  input.addEventListener('blur', function() {
+    setTimeout(() => {
+      autocompleteList.innerHTML = '';
+      autocompleteList.style.display = 'none';
+    }, 200);
+  });
+</script>
+
+</body>
+</html>

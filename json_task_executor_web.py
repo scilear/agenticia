@@ -44,6 +44,10 @@ last_executed_time = None
 def home():
     return render_template('index.html', last_executed=last_executed_time)
 
+@app.route('/test')
+def test():
+    return render_template('test.html', last_executed=last_executed_time)
+
 @app.route('/execute', methods=['POST'])
 def execute():
     global last_executed_time
