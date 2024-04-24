@@ -1,79 +1,219 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>AI Chat</h1>
-    <div id="chat-container">
-        <div id="chat-messages" style="height: 400px; overflow-y: scroll;"></div>
-        <form id="chat-form" style="position: fixed; bottom: 0; width: 80%;">
-            <textarea id="user-input" style="width: 100%; height: auto; resize: vertical;"></textarea>
-            <button type="submit">Send</button>
-        </form>
+   <!-- templates/index.html -->
+    <H1>Chatbot</H1>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .chat-container {
+            width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .chat-log {
+            padding: 20px;
+        }
+        .chat-input {
+            padding: 10px;
+            width: 100%;
+            height: 100px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+        }
+        .chat-input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .send-button {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .send-button:hover {
+            background-color: #3e8e41;
+        }
+        .chat-bubble {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            width: 80%;
+            display: flex;
+            align-items: flex-start;
+        }
+        .you {
+            background-color: #eee;
+        }
+        .bot {
+            background-color: #dff0d8;
+        }
+        .chat-name {
+            font-weight: bold;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        .chat-message {
+            flex-grow: 1;
+            padding-left: 10px;
+        }
+        .suggestions-list {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 5px;
+            width: 150px;
+        }
+
+        .suggestions-list div {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .suggestions-list div:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h2>Chatbot</h2>
+        <div class="chat-log" id="chat-log">
+            <!-- Chat history will be displayed here -->
+        </div>
+        <div class="send-to">
+            <select id="send-to-select">
+                <option value="">Select a recipient</option>
+                <option value="Alice">Alice</option>
+                <option value="Bob">Bob</option>
+                <option value="Carl">Carl</option>
+            </select>
+        </div>
+        <textarea id="chat-input" class="chat-input" placeholder="Type a message..."></textarea>
+        <button id="send-button" class="send-button">Send</button>
     </div>
+     <input type="text" id="userInput" list="users">
+    <datalist id="users">
+      <option value="Alice">
+      <option value="Bob">
+      <option value="Carl">
+      <!-- Add more options as needed -->
+    </datalist>
+    
 
     <script>
-        // Get the chat form, user input textarea, and chat messages container
-        var chatForm = document.getElementById('chat-form');
-        var userInput = document.getElementById('user-input');
-        var chatMessages = document.getElementById('chat-messages');
+        document.getElementById('userInput').addEventListener('input', function() {
+    var val = this.value.toLowerCase();
+    var options = document.getElementById('users').childNodes;
+    for (var i = 0; i < options.length; i++) {
+      var option = options[i];
+      if (option.value.toLowerCase().indexOf(val) !== -1) {
+        option.style.display = '';
+      } else {
+        option.style.display = 'none';
+      }
+    }
+  });
+  
+        document.addEventListener("DOMContentLoaded", function() {
+        const chatLog = document.getElementById('chat-log');
+        const chatInput = document.getElementById('chat-input');
+        const sendButton = document.getElementById('send-button');
+        const sendToSelector = document.getElementById('send-to-select');
+        
+        const users = ['Alice', 'Bob', 'Carl', 'David', 'Eve', 'Frank'];
+        let selectedIndex = -1;
 
-        // Event listener for form submission
-        chatForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-            sendMessage();
-        });
-
-        // Event listener for input changes in the user input textarea
-        userInput.addEventListener('input', function (event) {
-            adjustInputHeight();
-        });
-
-        /**
-         * Adjusts the height of the user input textarea based on its content.
-         * Limits the height to 10 lines.
-         */
-        function adjustInputHeight() {
-            userInput.style.height = 'auto';
-            userInput.style.height = Math.min(userInput.scrollHeight, 10 * userInput.rows) + 'px';
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.shiftKey)) {
+            return;
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            sendButton.click();
         }
+    });
 
-        // Event listener for keydown in the user input textarea
-        userInput.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter' && !event.ctrlKey && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-            } else if ((event.key === 'Enter' || event.key === 'Return') && event.shiftKey) {
-                // Shift+Enter: Go to the next line in the input box
-                userInput.value += '\n';
-            } else if ((event.key === 'Enter' || event.key === 'Return') && event.ctrlKey) {
-                // Ctrl+Enter: Send the message
-                event.preventDefault();
-                sendMessage();
+    chatInput.addEventListener('input', (e) => {
+        const inputValue = chatInput.value;
+        const atSymbolIndex = inputValue.lastIndexOf('@');
+        if (atSymbolIndex !== -1) {
+            const prefix = inputValue.substring(atSymbolIndex + 1);
+            const suggestions = users.filter((user) => user.startsWith(prefix)).slice(0, 3);
+            if (suggestions.length > 0) {
+                const suggestionsList = document.createElement('div');
+                suggestionsList.className = 'suggestions-list';
+                suggestions.forEach((suggestion) => {
+                    const suggestionItem = document.createElement('div');
+                    suggestionItem.textContent = suggestion;
+                    suggestionItem.addEventListener('click', () => {
+                        chatInput.value = inputValue.substring(0, atSymbolIndex) + suggestion;
+                        chatInput.focus();
+                    });
+                    suggestionsList.appendChild(suggestionItem);
+                });
+                chatInput.parentNode.appendChild(suggestionsList);
             }
-        });
-
-        /**
-         * Sends the user message.
-         * Resets the input box to its normal size.
-         */
-        function sendMessage() {
-            var userMessage = userInput.value.trim();
-            if (userMessage !== '') {
-                displayMessage('You', userMessage);
-                userInput.value = '';
-                userInput.style.height = 'auto';
-                userInput.focus();
+        } else {
+            const suggestionsList = chatInput.parentNode.querySelector('.suggestions-list');
+            if (suggestionsList) {
+                suggestionsList.remove();
             }
         }
-
-        /**
-         * Displays a message in the chat messages container.
-         * @param {string} sender - The sender of the message.
-         * @param {string} message - The content of the message.
-         */
-        function displayMessage(sender, message) {
-            var messageElement = document.createElement('div');
-            messageElement.innerText = sender + ': ' + message;
-            chatMessages.appendChild(messageElement);
+    });
+    document.addEventListener('click', (e) => {
+        const suggestionsList = chatInput.parentNode.querySelector('.suggestions-list');
+        if (suggestionsList && !suggestionsList.contains(e.target)) {
+            suggestionsList.remove();
         }
+    });
+
+    sendButton.addEventListener('click', () => {
+        const message = chatInput.value.trim();
+        const recipient = sendToSelector.value;
+        if (message && recipient) {
+            const formattedMessage = message.replace(/\n/g, '<br>'); // Replace newline characters with <br> tags
+            const chatBubble = document.createElement('div');
+            chatBubble.className = 'chat-bubble you';
+            const chatName = document.createElement('span');
+            chatName.className = 'chat-name';
+            chatName.textContent = 'You';
+            const chatMessage = document.createElement('span');
+            chatMessage.className = 'chat-message';
+            chatMessage.innerHTML = `@${recipient}: ${formattedMessage}`;
+            chatBubble.appendChild(chatName);
+            chatBubble.appendChild(chatMessage);
+            chatLog.appendChild(chatBubble);
+
+            fetch('/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `message=${message}&recipient=${recipient}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                const botBubble = document.createElement('div');
+                botBubble.className = 'chat-bubble bot';
+                const botName = document.createElement('span');
+                botName.className = 'chat-name';
+                botName.textContent = 'Bot';
+                const botMessage = document.createElement('span');
+                botMessage.className = 'chat-message';
+                botMessage.innerHTML = data.response.replace(/\n/g, '<br>');
+                botBubble.appendChild(botName);
+                botBubble.appendChild(botMessage);
+                chatLog.appendChild(botBubble);
+                chatInput.value = '';
+            });
+        }
+    });
+});
     </script>
 {% endblock %}

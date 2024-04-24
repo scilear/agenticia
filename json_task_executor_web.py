@@ -173,5 +173,12 @@ def chat():
         return jsonify({'response': ai_response})
     return render_template('chat.html')
 
+@app.route('/message', methods=['POST'])
+def handle_message():
+    message = request.form['message']
+    response = {'response': 'I understand the request:\n' + message}
+    return jsonify(response)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
