@@ -1,0 +1,54 @@
+I want to build a crew of AI agents working together to design software, 
+that only relies on minimal human input passed the first initial specs, below is a description of my plan and architecture of services/agents. Please review a suggest improvement or possible issues.
+
+My main hesitation is around how much do I want to break thigns doan into multiple agents versus an "omniscient/omnipotnet" agent that could do everything but might lose context in the process or get confused by the many instructions.
+
+In a second step I will ask for help prompting and preparing the agents we deem relevant
+
+1) The specs
+My ideas is to first work "manually" on the specs with the aid of a generic AI agent like chatGPT or Llama
+to get them detailed enough
+
+Then to have several agents working together to accomplish most of the work, starting with:
+
+2) The planning structure
+
+- the Orchestrator: it's role is to understand the specs, question them if needed and propose a project/implementation plan 
+detailing the environment and technical specificities to get it done.
+
+- The PlanReviewer: which will read the plan proposed by the Orchestrator as well as the specs aand make a critical judgment on it and suggestions to improve it if applicable, if no just answer. "PLAN OK"
+
+The Orchestrator and PlanvReviewer can iterate up to 5 feedback loop (to avoid too much time spent on details)
+
+Once at this stage, 
+The orchestrator must produce incrementally the different steps to accomplish the plan ( as many as needed) making sure each step can be validated by a measurable and reliable set of tests (it might be that some of those tests have to be performed by human because machine cannot do them effecively liek validating a design or a item behavior)
+
+Just to be clear, it will need to produce a first step detailing what needs to happen in terms of environment, tests and code.
+wait for a message acknoledging the succeful completion of the test or unsolvable issues.
+
+Then same process for the next step.
+
+3) the execution:
+The detailed plan of the step will be passed to 
+- the PlanExecutor: his job will be: 
+     * to details the software/hardware environment to be created (by default we will assume we have a Linux server with the latest python installed )
+     * to detail the code that needs to be produced and maybe the requirements to ensure that it can be tested too
+     * to detail the tests that will need to be coded with the method stubs and description 
+     
+
+
+- the Coder: his role will be to create the code: python, html, ... required by the PlanExecutor and produce a list of files
+- The Tester: his role will be to implement the test once he received the functions/class signatures and files (to know where to import what)
+- the code reviewer: it will review the code created by the coder aftre each coding iteration twice in a row unless evefything is ok in which case it will reply 'CODE OK' and same for the code produced by the tester
+- the InfrAI: he will be in charge of setting up the environment on the server, the virtualenv if needed and the structure of the directory, the security
+- The Formatter: the formatter will take the output of the Coder, The Tester and the InfraAI and format it into a specific json format that can then be itnerpreted by an adhoc existing program json_task_executor
+
+The output of the json_task_executor will then be fed back to PlanExecutor for review
+
+json_task_executor is the bridge with the "real world", it will create and execute the output of the AI. 
+It can: 
+  * execute command lines
+  * write code or text to any file on disk
+  * run the code
+
+
